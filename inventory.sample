@@ -1,0 +1,2 @@
+[vps]
+vps_hostname_or_ip ansible_user=vps_user ansible_become=true user_name=vps_user

@@ -1,0 +1,29 @@
+- name: Ensure user '{{ user_name }}' is created (without changing password if not provided)
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    groups: sudo,docker
+    state: present
+    create_home: yes
+    shell: /bin/bash
+    password: "{{ hashed_password | default(omit) }}"
+
+- name: Allow '{{ user_name }}' to run sudo without a password
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    line: '{{ user_name }} ALL=(ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+    state: present
+
+- name: Ensure .ssh directory exists for user '{{ user_name }}'
+  ansible.builtin.file:
+    path: "/home/{{ user_name }}/.ssh"
+    state: directory
+    owner: "{{ user_name }}"
+    mode: '0700'
+
+- name: Add SSH public key for user '{{ user_name }}'
+  ansible.builtin.copy:
+    content: "{{ ssh_public_key }}"
+    dest: "/home/{{ user_name }}/.ssh/authorized_keys"
+    owner: "{{ user_name }}"
+    mode: '0600'

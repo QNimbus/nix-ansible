@@ -1,0 +1,19 @@
+- name: Pre-configure iptables-persistent to automatically save rules
+  ansible.builtin.debconf:
+    name: iptables-persistent
+    question: iptables-persistent/autosave_v4
+    vtype: boolean
+    value: true
+
+- name: Pre-configure ip6tables-persistent to automatically save rules
+  ansible.builtin.debconf:
+    name: iptables-persistent
+    question: iptables-persistent/autosave_v6
+    vtype: boolean
+    value: true
+
+- name: Install iptables-persistent package
+  ansible.builtin.apt:
+    name: iptables-persistent
+    state: present
+  notify: Save iptables rules

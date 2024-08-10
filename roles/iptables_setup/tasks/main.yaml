@@ -1,0 +1,83 @@
+- name: Set default policy for INPUT, FORWARD, OUTPUT chains to ACCEPT
+  ansible.builtin.iptables:
+    table: filter
+    chain: "{{ item }}"
+    policy: ACCEPT
+  loop:
+    - INPUT
+    - FORWARD
+    - OUTPUT
+
+- name: Flush all iptables rules for the filter table
+  ansible.builtin.iptables:
+    table: filter
+    chain: "{{ item }}"
+    flush: yes
+  loop:
+    - INPUT
+    - FORWARD
+    - OUTPUT
+
+- name: Set up IPv4 iptables rules - allow headscale on ports 8080 and 9090
+  ansible.builtin.iptables:
+    table: filter
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ item }}"
+    match: state
+    ctstate: NEW
+    jump: ACCEPT
+  loop:
+    - 8080
+    - 9090
+
+- name: Set up IPv4 iptables rules - allow SSH
+  ansible.builtin.iptables:
+    table: filter
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ ssh_port }}"
+    match: state
+    ctstate: NEW
+    jump: ACCEPT
+
+- name: Set ip IPv4 iptables rules - allow established connections
+  ansible.builtin.iptables:
+    table: filter
+    chain: INPUT
+    match: state
+    ctstate: RELATED,ESTABLISHED
+    jump: ACCEPT
+
+- name: Set ip IPv4 iptables rules - allow everything from localhost
+  ansible.builtin.iptables:
+    table: filter
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+
+- name: Drop all other IPv4 incoming connections
+  ansible.builtin.iptables:
+    table: filter
+    chain: INPUT
+    jump: DROP
+
+- name: Set default INPUT policy to DROP
+  ansible.builtin.iptables:
+    table: filter
+    chain: INPUT
+    policy: DROP
+
+- name: Drop all IPv6 incoming connections
+  ansible.builtin.iptables:
+    table: filter
+    chain: INPUT
+    jump: DROP
+    ip_version: ipv6
+
+- name: Set default INPUT policy to DROP for IPv6
+  ansible.builtin.iptables:
+    table: filter
+    chain: INPUT
+    policy: DROP
+    ip_version: ipv6

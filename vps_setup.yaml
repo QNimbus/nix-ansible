@@ -1,0 +1,31 @@
+---
+- name: Set up a new VPS
+  hosts: vps
+  become: true
+  vars:
+    ssh_public_key: "{{ lookup('file', 'key.pub') }}"
+  vars_prompt:
+    - name: user_name
+      prompt: "Enter username"
+      private: no
+      default: vps_user
+
+  roles:
+    - iptables_setup
+    - docker_installation
+    - user_setup
+    - ssh_configuration
+    - iptables_persistence
+
+  handlers:
+    - name: Restart SSH
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
+
+    - name: Save iptables rules
+      ansible.builtin.shell: iptables-save > /etc/iptables/rules.v4
+      become: true
+
+    - name: Save ip6tables rules
+      ansible.builtin.shell: ip6tables-save > /etc/iptables/rules.v6
