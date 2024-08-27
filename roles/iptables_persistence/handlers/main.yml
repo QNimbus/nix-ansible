@@ -1,0 +1,8 @@
+---
+# handlers file for iptables_persistence_
+- name: Save iptables rules
+  ansible.builtin.shell: iptables-save > /etc/iptables/rules.v4
+  become: true
+
+- name: Save ip6tables rules
+  ansible.builtin.shell: ip6tables-save > /etc/iptables/rules.v6

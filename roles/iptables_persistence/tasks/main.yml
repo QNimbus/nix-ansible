@@ -1,3 +1,5 @@
+---
+# tasks file for iptables_persistence_
 - name: Pre-configure iptables-persistent to automatically save rules
   ansible.builtin.debconf:
     name: iptables-persistent
