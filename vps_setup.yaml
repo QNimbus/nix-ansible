@@ -4,25 +4,48 @@
   become: true
   vars:
     ssh_public_key: "{{ lookup('file', 'key.pub') }}"
-  vars_prompt:
-    - name: user_name
-      prompt: "Enter username"
-      private: no
-      default: vps_user
 
-  roles:
-    - iptables_setup
-    - docker_installation
-    - user_setup
-    - ssh_configuration
-    - iptables_persistence
+  tasks:
+    - name: Prompt for user_name if not already defined
+      pause:
+        prompt: "Enter username"
+      register: user_name_prompt
+      when: user_name is not defined
+
+    - name: Set user_name fact if not already defined
+      set_fact:
+        user_name: "{{ user_name_prompt.user_input }}"
+      when: user_name is not defined
+
+    - name: Include iptables_setup role
+      include_role:
+        name: iptables_setup
+
+    - name: Include docker_installation role
+      include_role:
+        name: docker_installation
+
+    - name: Include user_setup role
+      include_role:
+        name: user_setup
+
+    - name: Include ssh_configuration role
+      include_role:
+        name: ssh_configuration
+
+    - name: Include iptables_persistence role
+      include_role:
+        name: iptables_persistence
+
+    - name: Include disable_systemd_resolved role
+      include_role:
+        name: disable_systemd_resolved
+
+    - name: Include disable_ipv6 role
+      include_role:
+        name: disable_ipv6
 
   handlers:
-    - name: Restart SSH
-      ansible.builtin.service:
-        name: ssh
-        state: restarted
-
     - name: Save iptables rules
       ansible.builtin.shell: iptables-save > /etc/iptables/rules.v4
       become: true

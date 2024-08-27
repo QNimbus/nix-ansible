@@ -1,0 +1,36 @@
+---
+# tasks file for disable_ipv6
+- name: Check if IPv6 is disabled via kernel parameters
+  command: grep -q 'ipv6.disable=1' /proc/cmdline
+  register: ipv6_disabled_kernel
+  ignore_errors: yes
+  changed_when: false
+
+- name: Disable IPv6 in sysctl
+  sysctl:
+    name: "{{ item }}"
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+  loop:
+    - net.ipv6.conf.all.disable_ipv6
+    - net.ipv6.conf.default.disable_ipv6
+  when: ipv6_disabled_kernel.rc != 0
+
+- name: Update GRUB to disable IPv6
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX=.*'
+    line: 'GRUB_CMDLINE_LINUX="ipv6.disable=1"'
+    backup: yes
+
+- name: Update GRUB configuration for Debian/Ubuntu
+  command: update-grub
+  when: ansible_os_family == "Debian" or ansible_os_family == "Ubuntu"
+  notify: reboot
+
+- name: Rebuild GRUB configuration for RedHat/CentOS
+  command: grub2-mkconfig -o /boot/grub2/grub.cfg
+  when: ansible_os_family == "RedHat" or ansible_os_family == "CentOS"
+  notify: reboot

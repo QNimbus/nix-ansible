@@ -1,2 +1,6 @@
+[all:vars]
+user_name=vps_user
+dns_servers=["1.1.1.1", "9.9.9.9"]
+
 [vps]
-vps_hostname_or_ip ansible_user=vps_user ansible_become=true user_name=vps_user
+vps_hostname_or_ip ansible_user=vps_user ansible_become=true

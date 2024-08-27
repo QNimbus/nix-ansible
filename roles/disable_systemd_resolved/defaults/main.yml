@@ -1,0 +1,5 @@
+---
+# defaults file for disable_systemd_resolved
+dns_servers:
+  - "8.8.8.8"
+  - "8.8.4.4"

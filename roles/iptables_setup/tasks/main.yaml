@@ -18,7 +18,7 @@
     - FORWARD
     - OUTPUT
 
-- name: Set up IPv4 iptables rules - allow headscale on ports 8080 and 9090
+- name: Set up IPv4 iptables rules - allow HTTP/HTTPS
   ansible.builtin.iptables:
     table: filter
     chain: INPUT
@@ -28,8 +28,8 @@
     ctstate: NEW
     jump: ACCEPT
   loop:
-    - 8080
-    - 9090
+    - 80
+    - 443
 
 - name: Set up IPv4 iptables rules - allow SSH
   ansible.builtin.iptables:

@@ -1,0 +1,57 @@
+---
+# tasks file for disable_systemd_resolved
+- name: Stop and disable systemd-resolved service
+  systemd:
+    name: systemd-resolved
+    state: stopped
+    enabled: no
+
+- name: Remove the symlink for /etc/resolv.conf if it exists
+  file:
+    path: /etc/resolv.conf
+    state: absent
+    force: yes
+
+- name: Create a new static resolv.conf
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+
+- name: Restart network services to apply changes (Debian/Ubuntu)
+  block:
+    - name: Check if systemd-networkd is running
+      service_facts:
+
+    - name: Restart systemd-networkd if running
+      systemd:
+        name: systemd-networkd
+        state: restarted
+      when: "'systemd-networkd' in ansible_facts.services and ansible_facts.services['systemd-networkd'].state == 'running'"
+
+    - name: Restart NetworkManager if running
+      systemd:
+        name: NetworkManager
+        state: restarted
+      when: "'NetworkManager' in ansible_facts.services and ansible_facts.services['NetworkManager'].state == 'running'"
+
+  when: ansible_os_family == "Debian" or ansible_os_family == "Ubuntu"
+
+- name: Restart network services to apply changes (RedHat/CentOS)
+  block:
+    - name: Check if systemd-networkd is running
+      service_facts:
+
+    - name: Restart systemd-networkd if running
+      systemd:
+        name: systemd-networkd
+        state: restarted
+      when: "'systemd-networkd' in ansible_facts.services and ansible_facts.services['systemd-networkd'].state == 'running'"
+
+    - name: Restart NetworkManager if running
+      systemd:
+        name: NetworkManager
+        state: restarted
+      when: "'NetworkManager' in ansible_facts.services and ansible_facts.services['NetworkManager'].state == 'running'"
+
+  when: ansible_os_family == "RedHat" or ansible_os_family == "CentOS"
+

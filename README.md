@@ -128,20 +128,20 @@ vps_hostname_or_ip ansible_user=vps_user ansible_become=true user_name=vps_user
 The default `ansible_user` is `vps_user`, but since this user only exists after the first playbook run, you need to run the playbook with `ansible_user=root` on the first execution. The `password` variable is used to set the password for the `vps_user` account:
 
 ```bash
-ansible-playbook -i inventory playbook/vps_setup.yaml --extra-vars "ansible_user=root password=secret"
+ansible-playbook -i inventory vps_setup.yaml --extra-vars "ansible_user=root password=secret"
 ```
 
 **Subsequent Runs:**
 After the initial run, root login via SSH is disabled. Ansible will use the `vps_user` account as a default for subsequent runs:
 
 ```bash
-ansible-playbook -i inventory playbook/vps_setup.yaml
+ansible-playbook -i inventory vps_setup.yaml
 ```
 
 You can also pass variables using the `--extra-vars` option, for example to specify a custom SSH key:
 
 ```bash
-ansible-playbook -i inventory playbook/vps_setup.yaml --extra-vars "ansible_ssh_private_key_file=./id_ed25519"
+ansible-playbook -i inventory vps_setup.yaml --extra-vars "ansible_ssh_private_key_file=./id_ed25519"
 ```
 
 ### Customization
