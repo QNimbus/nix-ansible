@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+auto {{ network_interface }}
+iface {{ network_interface }} inet dhcp
+    mtu {{ mtu_size }}

@@ -1,0 +1,24 @@
+---
+# tasks file for configure_mtu
+- name: Ensure the network interface configuration directory exists
+  file:
+    path: "/etc/network/interfaces.d"
+    state: directory
+
+- name: Configure the MTU for the network interface
+  template:
+    src: mtu-interface.j2
+    dest: "/etc/network/interfaces.d/{{ network_interface }}.cfg"
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart network interface {{ network_interface }}
+
+- name: Check current MTU
+  command: ip link show {{ network_interface }}
+  register: interface_status
+
+- name: Ensure the MTU is set immediately
+  command: ip link set dev {{ network_interface }} mtu {{ mtu_size }}
+  when: "'mtu ' ~ mtu_size ~ ' ' not in interface_status.stdout"
+  notify: Restart network interface {{ network_interface }}

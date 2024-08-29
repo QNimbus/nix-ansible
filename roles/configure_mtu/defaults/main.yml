@@ -1,0 +1,4 @@
+---
+# defaults file for configure_mtu
+network_interface: "ens3"
+mtu_size: 1448
