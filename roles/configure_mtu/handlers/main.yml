@@ -1,0 +1,5 @@
+---
+# handlers file for configure_mtu
+- name: Restart network interface {{ network_interface }}
+  command: ifdown {{ network_interface }} && ifup {{ network_interface }}
+

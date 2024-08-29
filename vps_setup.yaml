@@ -44,3 +44,10 @@
     - name: Include disable_ipv6 role
       include_role:
         name: disable_ipv6
+
+    - name: Include configure_mtu role
+      include_role:
+        name: configure_mtu
+      vars:
+        network_interface: "ens3"
+        mtu_size: 1448
