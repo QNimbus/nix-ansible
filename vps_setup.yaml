@@ -41,9 +41,9 @@
       include_role:
         name: disable_systemd_resolved
 
-    - name: Include disable_ipv6 role
-      include_role:
-        name: disable_ipv6
+    # - name: Include disable_ipv6 role
+    #   include_role:
+    #     name: disable_ipv6
 
     - name: Include configure_mtu role
       include_role:

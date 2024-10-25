@@ -21,3 +21,11 @@
     name: root
     password_lock: yes
     update_password: always
+
+- name: Enable SSH agent forwarding
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?AllowAgentForwarding'
+    line: 'AllowAgentForwarding yes'
+    state: present
+  notify: Restart SSH
